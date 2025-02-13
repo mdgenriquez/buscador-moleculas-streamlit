@@ -69,7 +69,7 @@ def page3():
       view.setStyle({style:{}})
       view.zoomTo()
       showmol(view)
-       compound_smiles=st.text_input('Ingresa tu código SMILES','FCCC(=O)[O-]')
+       compound_smiles = st.text_input('Ingresa tu código SMILES', 'FCCC(=O)[O-]')
   m = Chem.MolFromSmiles(compound_smiles)
   
   Draw.MolToFile(m,'mol.png')
