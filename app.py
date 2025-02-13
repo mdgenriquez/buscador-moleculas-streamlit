@@ -53,3 +53,19 @@ def page2():
     Draw.MolToFile(m1,'mol1.png')
     st.write('Molecule 2D :smiley:')
     st.image('mol1.png')
+def page3():
+  st.header('De SMILES a visualización 3D 🍫', divider='rainbow')
+  st.sidebar.markdown("# 1D 🖙 3D")
+  st.sidebar.markdown("Generación de estructura tridimensional a partir del código SMILES")
+  def showm(smi, style='stick'):
+      mol = Chem.MolFromSmiles(smi)
+      mol = Chem.AddHs(mol)
+      AllChem.EmbedMolecule(mol)
+      AllChem.MMFFOptimizeMolecule(mol, maxIters=200)
+      mblock = Chem.MolToMolBlock(mol)
+  
+      view = py3Dmol.view(width=350, height=350)
+      view.addModel(mblock, 'mol')
+      view.setStyle({style:{}})
+      view.zoomTo()
+      showmol(view)
