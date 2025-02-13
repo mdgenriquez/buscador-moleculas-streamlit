@@ -69,3 +69,28 @@ def page3():
       view.setStyle({style:{}})
       view.zoomTo()
       showmol(view)
+       compound_smiles=st.text_input('Ingresa tu código SMILES','FCCC(=O)[O-]')
+  m = Chem.MolFromSmiles(compound_smiles)
+  
+  Draw.MolToFile(m,'mol.png')
+
+  c1,c2=st.columns(2)
+  with c1:
+    st.write('Molecule 2D :smiley:')
+    st.image('mol.png')
+    #botón de descarga 
+    with open('mol.png', 'rb') as f:
+        st.download_button('Descargar 2D (en formato PNG)', f, file_name='mol.png', mime='image/png')
+  with c2:
+    st.write('Molecule 3D :frog:')
+    showm(compound_smiles)
+    mol_3d = Chem.MolFromSmiles(compound_smiles)
+    mol_3d = Chem.AddHs(mol_3d)
+    AllChem.EmbedMolecule(mol_3d)
+    AllChem.MMFFOptimizeMolecule(mol_3d, maxIters=200)
+    mol_block = Chem.MolToMolBlock(mol_3d)
+    with open('mol3d.mol', 'w') as f:
+        f.write(mol_block)
+    #botón de descarga 
+    with open('mol3d.mol', 'rb') as f:
+      st.download_button('Descargar 3D (en formato MOL)', f, file_name='mol3d.mol', mime='chemical/x-mdl-molfile')
