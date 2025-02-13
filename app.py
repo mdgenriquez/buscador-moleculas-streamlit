@@ -1,3 +1,21 @@
+import streamlit as st
+from pubchempy import get_compounds, Compound
+import sys
+import pubchempy as pcp
+
+import streamlit.components.v1 as components
+import py3Dmol
+from stmol import showmol
+from rdkit import Chem
+from rdkit.Chem import Draw
+from rdkit.Chem import AllChem
+
+##############
+st.sidebar.image("img/gpx4.png",
+                 caption="Jesus Alvarado-Huayhuaz")
+
+#############################Pagina 1############################## 
+
 def Home():
     st.header('De nombre común a 2D :cat:', divider='rainbow')
     st.sidebar.markdown("# Nombre clásico:")
@@ -53,6 +71,9 @@ def page2():
     Draw.MolToFile(m1,'mol1.png')
     st.write('Molecule 2D :smiley:')
     st.image('mol1.png')
+  
+#############################Pagina 3##############################    
+
 def page3():
   st.header('De SMILES a visualización 3D 🍫', divider='rainbow')
   st.sidebar.markdown("# 1D 🖙 3D")
@@ -69,7 +90,8 @@ def page3():
       view.setStyle({style:{}})
       view.zoomTo()
       showmol(view)
-       compound_smiles = st.text_input('Ingresa tu código SMILES', 'FCCC(=O)[O-]')
+  
+  compound_smiles=st.text_input('Ingresa tu código SMILES','FCCC(=O)[O-]')
   m = Chem.MolFromSmiles(compound_smiles)
   
   Draw.MolToFile(m,'mol.png')
@@ -94,7 +116,12 @@ def page3():
     #botón de descarga 
     with open('mol3d.mol', 'rb') as f:
       st.download_button('Descargar 3D (en formato MOL)', f, file_name='mol3d.mol', mime='chemical/x-mdl-molfile')
-        page_names_to_funcs = {
+
+################################################################### 
+##########################Configuracion############################    
+###################################################################    
+
+page_names_to_funcs = {
   "Nombre común a 2D": Home,
   "SMILES a 2D": page2,
   "Vista 3D": page3,
