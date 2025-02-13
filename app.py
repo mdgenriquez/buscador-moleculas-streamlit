@@ -1,60 +1,34 @@
-git clone https://github.com/TU_USUARIO/buscador-moleculas-streamlit.git
-cd buscador-moleculas-streamlit
 import streamlit as st
-import pubchempy as pcp
 from rdkit import Chem
-from rdkit.Chem import Draw
-import io
-import requests
-from PIL import Image
+from rdkit.Chem import Draw, rdFMCS
+from rdkit.Chem.Draw import rdMolDraw2D
+from io import BytesIO
 
-# Título de la app
-st.title("Buscador de Moléculas 2D y Bioisósteros")
+def mol_to_svg(mol):
+    drawer = rdMolDraw2D.MolDraw2DSVG(300, 300)
+    drawer.DrawMolecule(mol)
+    drawer.FinishDrawing()
+    return drawer.GetDrawingText()
 
-# Barra de búsqueda
-search_query = st.text_input("Ingresa el nombre o CID de la molécula:")
+def find_bioisosteres(mol):
+    # Función simulada para búsqueda de bioisósteros (se puede mejorar con una base de datos real)
+    return [mol]  # Retorna la misma molécula como ejemplo
 
-# Función para obtener la estructura 2D de una molécula a partir de PubChem
-def get_molecule_image(search_query):
-    # Intentar obtener el CID (número de identificación de PubChem) de la molécula
-    compound = None
-    if search_query.isdigit():
-        # Si el input es un CID
-        compound = pcp.Compound.from_cid(int(search_query))
-    else:
-        # Si el input es un nombre
-        compound = pcp.get_compounds(search_query, 'name')[0]
-    
-    # Obtenemos la estructura 2D de la molécula
-    smiles = compound.isomeric_smiles
-    mol = Chem.MolFromSmiles(smiles)
-    if mol:
-        img = Draw.MolToImage(mol)
-        return img
-    else:
-        return None
+st.title("Buscador de Bioisósteros en 2D")
 
-# Función para obtener bioisósteros o estructuras similares
-def get_similar_molecules(search_query):
-    # Buscando bioisósteros utilizando PubChem
-    compound = pcp.get_compounds(search_query, 'name')[0]
-    cid = compound.cid
-    similar_compounds = pcp.get_compounds(cid, 'cid')[0].to_dict(properties=['synonyms', 'isomeric_smiles'])
-    
-    return similar_compounds
-
-# Mostrar la imagen 2D de la molécula
-if search_query:
-    img = get_molecule_image(search_query)
-    if img:
-        st.image(img, caption="Estructura 2D de la molécula", use_column_width=True)
-    else:
-        st.write("No se encontró la molécula o estructura 2D válida.")
-    
-    # Mostrar bioisósteros o estructuras similares
-    st.subheader("Bioisósteros o Estructuras Similares")
-    similar_molecules = get_similar_molecules(search_query)
-    if similar_molecules:
-        st.write(similar_molecules)
-    else:
-        st.write("No se encontraron bioisósteros o estructuras similares.")
+smiles_input = st.text_input("Introduce un SMILES:")
+if smiles_input:
+    try:
+        mol = Chem.MolFromSmiles(smiles_input)
+        if mol:
+            st.subheader("Estructura ingresada:")
+            st.image(Draw.MolToImage(mol), caption="Molécula ingresada", use_column_width=False)
+            
+            bioisosteres = find_bioisosteres(mol)
+            st.subheader("Bioisósteros encontrados:")
+            for bioiso in bioisosteres:
+                st.image(Draw.MolToImage(bioiso), caption="Bioisóstero", use_column_width=False)
+        else:
+            st.error("No se pudo interpretar el SMILES ingresado.")
+    except Exception as e:
+        st.error(f"Error al procesar la molécula: {e}")
